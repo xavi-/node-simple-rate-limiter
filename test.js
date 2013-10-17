@@ -1,7 +1,7 @@
 var assert = require("assert");
 var limit = require("./");
 
-const SLOP = 2; // Timers don't seem accurate to the millisecond
+const SLOP = 5; // Timers don't seem accurate to the millisecond
 
 var tests = {
 	expected: 4,
@@ -10,7 +10,7 @@ var tests = {
 };
 function done(times, count, to, per) {
 	for(var i = 0; i < count - to; i++) {
-		var diff = times[i + to].time - times[i].time + SLOP;
+		var diff = (times[i + to].time - times[i].time) + SLOP;
 		assert.ok(per <= diff, "Diff found: " + diff + "; Expected: " + per);
 	}
 	times.forEach(function(time, idx) { assert.equal(idx, time.idx); });
