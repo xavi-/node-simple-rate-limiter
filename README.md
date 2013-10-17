@@ -38,7 +38,7 @@ for(var i = 0; i < 3; i++) { init(); }
 Similarly, if `per` is never called, `func` is executed at most `count` number of times:
 
 ```javascript
-var dos = limit(function() { console.log("twice only") }).to(2);
+var dos = limit(function() { console.log("twice only"); }).to(2);
 for(var i = 0; i < 3; i++) { dos(); }
 
 /*** Console output: ***/
