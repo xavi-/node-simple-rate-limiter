@@ -8,17 +8,17 @@ var tests = {
 	executed: 0,
 	finished: function() { tests.executed++; }
 };
-function done(times, count, to, per) {
-	for(var i = 0; i < count - to; i++) {
-		var diff = (times[i + to].time - times[i].time) + SLOP;
-		assert.ok(per <= diff, "Diff found: " + diff + "; Expected: " + per);
-	}
-	times.forEach(function(time, idx) { assert.equal(idx, time.idx); });
-	tests.finished();
-}
 
 function runBasicTest(count, to, per) {
 	var times = [];
+	var done = function() {
+		for(var i = 0; i < count - to; i++) {
+			var diff = (times[i + to].time - times[i].time) + SLOP;
+			assert.ok(per <= diff, "Diff found: " + diff + "; Expected: " + per);
+		}
+		times.forEach(function(time, idx) { assert.equal(idx, time.idx); });
+		tests.finished();
+	};
 	var saveTime = limit(function(idx) {
 		times.push({ idx: idx, time: Date.now() });
 		console.log("executed idx: %d/%d", idx, count);
