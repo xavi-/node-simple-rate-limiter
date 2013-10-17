@@ -1,3 +1,5 @@
+var slice = Array.prototype.slice;
+
 module.exports = function limit(fn) {
 	var _to = 1, _per = -1, available = 1;
 	var queue = [], timer;
@@ -16,7 +18,7 @@ module.exports = function limit(fn) {
 
 	var limiter = function() {
 		if(available > 0) { fn.apply(null, arguments); available -= 1; }
-		else if(_per > -1) { queue.push(Array.apply(null, arguments)); }
+		else if(_per > -1) { queue.push(slice.call(arguments, 0)); }
 
 		if(!timer && _per > -1) { timer = setTimeout(pump, _per); }
 	};
