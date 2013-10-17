@@ -17,7 +17,7 @@ function done(times, count, to, per) {
 	tests.finished();
 }
 
-function runTest(count, to, per) {
+function runBasicTest(count, to, per) {
 	var times = [];
 	var saveTime = limit(function(idx) {
 		times.push({ idx: idx, time: Date.now() });
@@ -31,10 +31,10 @@ function runTest(count, to, per) {
 	}
 }
 
-runTest(50, 10, 1000);
-runTest(25, 1, 100);
-runTest(2500, 100, 10);
-runTest(101, 73, 1409);
+runBasicTest(50, 10, 1000);
+runBasicTest(25, 1, 100);
+runBasicTest(2500, 100, 10);
+runBasicTest(101, 73, 1409);
 
 process.on("exit", function() {
 	assert.equal(tests.executed, tests.expected);
