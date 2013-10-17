@@ -24,7 +24,7 @@ function runBasicTest(count, to, per) {
 		console.log("executed idx: %d/%d", idx, count);
 
 		if(count <= times.length) { done(times, count, to, per); }
-	}).to(to).per(per);
+	}).to(0).per(0).to(to).per(per);
 
 	for(var i = 0; i < count; i++) {
 		saveTime(i);
