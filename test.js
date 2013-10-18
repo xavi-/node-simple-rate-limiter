@@ -4,7 +4,7 @@ var limit = require("./");
 const SLOP = 5; // Timers don't seem accurate to the millisecond
 
 var tests = {
-	expected: 289,
+	expected: 291,
 	executed: 0,
 	finished: function() { tests.executed++; }
 };
@@ -45,7 +45,7 @@ function runTickTests(count, per) {
 }
 
 
-(function runErraticQueueTest(count, to, per) {
+function runErraticQueueTest(count, to, per, erraticTimes) {
 	var times = [];
 	var done = function() {
 		for(var i = 0; i < count - to; i++) {
@@ -62,27 +62,12 @@ function runTickTests(count, per) {
 		if(count <= times.length) { done(times, count, to, per); }
 	}).to(to).per(per);
 
-	setTimeout(function() { saveTime(0) }, 0);
-	setTimeout(function() { saveTime(1) }, 800);
-	setTimeout(function() { saveTime(2) }, 800);
-	setTimeout(function() { saveTime(3) }, 800);
-	setTimeout(function() { saveTime(4) }, 850);
-	setTimeout(function() { saveTime(5) }, 850);
-	setTimeout(function() { saveTime(6) }, 850);
-	setTimeout(function() { saveTime(7) }, 1050);
-	setTimeout(function() { saveTime(8) }, 1100);
-	setTimeout(function() { saveTime(9) }, 1100);
-	setTimeout(function() { saveTime(10) }, 1100);
-	setTimeout(function() { saveTime(11) }, 1100);
-	setTimeout(function() { saveTime(12) }, 1800);
-	setTimeout(function() { saveTime(13) }, 1800);
-	setTimeout(function() { saveTime(14) }, 1800);
-	setTimeout(function() { saveTime(15) }, 1800);
-	setTimeout(function() { saveTime(16) }, 1800);
-	setTimeout(function() { saveTime(17) }, 2100);
-	setTimeout(function() { saveTime(18) }, 2100);
-	setTimeout(function() { saveTime(19) }, 2100);
-})(20, 10, 1000);
+	for(var i = 0; i < erraticTimes.length; i++) {
+		setTimeout((function(idx) {
+			return function() { saveTime(idx); };
+		})(i), erraticTimes[i]);
+	}
+}
 
 runBasicTest(50, 10, 1000);
 runBasicTest(25, 1, 100);
@@ -93,6 +78,26 @@ runTickTests(3, 1000);
 runTickTests(25, 100);
 runTickTests(250, 10);
 runTickTests(3, 1409);
+
+var erraticTimes = [
+	[
+		0, 800, 800, 800, 850, 850, 850, 1050, 1100, 1100, 1100, 1100, 1800, 1800, 1800, 1800,
+		1800, 2100, 2100, 2100
+	],
+	[
+		0, 837, 841, 843, 844, 850, 974, 985, 987, 995, 1121, 1446, 1689, 1691, 1697, 1698, 1712,
+		1825, 1827, 1828, 1833, 2218, 2675, 2677, 2678, 2682, 2684, 2814, 2815, 2816, 2817, 3214,
+		3668, 3681, 3683, 3686, 3690, 3808, 3821, 3823, 3824, 4218, 4664, 4668, 4676, 4680, 4682,
+		4796, 4797, 4814, 4822, 5214, 5678
+	],
+	[
+		0, 3191, 3205, 3211, 3216, 3222, 3227, 3234, 3240, 3245, 3251, 3258, 3275, 3361, 3381,
+		3391, 3408, 3424, 3461, 3473, 3498, 3508, 3522, 3548, 3554, 3561, 3584, 3590, 3607, 3620,
+		3627, 3637, 3664, 3698, 3706, 3720, 3726, 3752, 3759, 3772, 3784, 3798, 3807, 3819, 3829,
+		3848, 3863, 3875, 3888, 3895, 3909, 3920, 3926
+	]
+];
+erraticTimes.forEach(function(times) { runErraticQueueTest(times.length, 10, 1000, times); });
 
 var init = limit(function() { assert.ok(init.calls++ < 1); tests.finished(); });
 init.calls = 0;
