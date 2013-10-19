@@ -19,7 +19,7 @@ module.exports = function limit(fn) {
 		}
 
 		if(pastExecs.length <= 0) { timer = null; }
-		else if(queue.length <= 0) {
+		else if(queue.length <= 0) { // Clear pastExec array when queue is empty asap
 			var lastIdx = pastExecs.length - 1;
 			timer = setTimeout(pump, _per - (now - pastExecs[lastIdx]));
 		} else { timer = setTimeout(pump, _per - (now - pastExecs[0])); }
