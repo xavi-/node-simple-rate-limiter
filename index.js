@@ -32,10 +32,7 @@ module.exports = function limit(fn) {
 		if(!timer && _per > -1) { timer = setTimeout(pump, _per); }
 	};
 
-	limiter.to = function(count) {
-		_to = count;
-		return limiter;
-	};
+	limiter.to = function(count) { _to = count; return limiter; };
 	limiter.per = function(time) { _per = time; return limiter; };
 
 	return limiter;
