@@ -1,7 +1,7 @@
 {
   "name": "simple-rate-limiter",
   "version": "0.1.1",
-  "description": "A laughably simplistic router for node.js",
+  "description": "A simple way to rate limit how often a function is executed.",
   "keywords": [
     "throttle",
     "rate limit",
