@@ -4,7 +4,7 @@ var limit = require("./");
 const SLOP = 5; // Timers don't seem accurate to the millisecond
 
 var tests = {
-	expected: 291,
+	expected: 292,
 	executed: 0,
 	finished: function() { tests.executed++; }
 };
@@ -108,6 +108,10 @@ for(var i = 0; i < 5; i++) { init(); }
 var dos = limit(function() { assert.ok(dos.calls++ < 2); tests.finished(); }).to(2);
 dos.calls = 0;
 for(var i = 0; i < 5; i++) { dos(); }
+
+var isSet = false;
+limit(function() { assert.ok(isSet); tests.finished(); })();
+isSet = true;
 
 process.on("exit", function() {
 	assert.equal(tests.executed, tests.expected);
