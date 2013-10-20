@@ -6,6 +6,22 @@ Currently works with node.js v0.10.1+ (and probably lower).
 
 ## Examples
 
+If you want to limit _all_ requests:
+
+```javascript
+var limit = require("limit");
+var request = limit(require("request")).to(10).per(1000);
+
+userIds.forEach(function(userId) {
+	var url = "http://easily-overwhelmed-api.com/users/" + userId;
+	request(url, function(err, res, body) {
+		/* ... Yay! Not a too-many-request-per-second error! ... */
+	});
+})
+```
+
+Or if you'd like to be a bit more fine grain and/or explicit:
+
 ```javascript
 var limit = require("simple-rate-limiter");
 var callApi = limit(function(userId, callback) {
