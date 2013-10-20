@@ -18,10 +18,10 @@ function runBasicTest(count, to, per) {
 		}
 		times.forEach(function(time, idx) { assert.equal(idx, time.idx); });
 		tests.finished();
+		console.log("Completed basic test -- count: %d, to: %d, per: %d", count, to, per);
 	};
 	var saveTime = limit(function(idx) {
 		times.push({ idx: idx, time: Date.now() });
-		console.log("executed idx: %d/%d", idx, count);
 
 		if(count <= times.length) { done(times, count, to, per); }
 	}).to(0).per(0).to(to).per(per);
@@ -29,6 +29,7 @@ function runBasicTest(count, to, per) {
 	for(var i = 0; i < count; i++) {
 		saveTime(i);
 	}
+	console.log("Starting basic test -- count: %d, to: %d, per: %d", count, to, per);
 }
 
 function runTickTests(count, per) {
@@ -54,10 +55,10 @@ function runErraticQueueTest(count, to, per, erraticTimes) {
 		}
 		times.forEach(function(time, idx) { assert.equal(idx, time.idx); });
 		tests.finished();
+		console.log("Completed erratic test -- count: %d, to: %d, per: %d", count, to, per);
 	};
 	var saveTime = limit(function(idx) {
 		times.push({ idx: idx, time: Date.now() });
-		console.log("Erratic executed idx: %d/%d", idx, count);
 
 		if(count <= times.length) { done(times, count, to, per); }
 	}).to(to).per(per);
@@ -67,6 +68,7 @@ function runErraticQueueTest(count, to, per, erraticTimes) {
 			return function() { saveTime(idx); };
 		})(i), erraticTimes[i]);
 	}
+	console.log("Starting erratic test -- count: %d, to: %d, per: %d", count, to, per);
 }
 
 runBasicTest(50, 10, 1000);
