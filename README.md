@@ -40,10 +40,10 @@ userIds.forEach(function(userId) {
 
 Basic usage: `var limited = limit(fn);`
 
-- `limited.to(count=1)` -- The number of times `fn` will be execute within the time specified by `.per(time)`.
-- `limited.per(time=Infinity)` -- The period of time in which `fn` will be executed `.to(count)` number of times.
-- `limited.evenly([toggle=true])` -- Off by default.  When true, `fn` will be executed evenly through the time period specified by `.per(time)`.  For example, if set to true and `.to(10)` and `.per(1000)`, then `fn` will be executed every 100ms.
-- `limited.withFuzz([percent=0.1])` -- Set to 0 by default.  Adds a random factor to the delay time.  For example if set to 0.1 and `.to(10)` and `.per(1000)`, then `fn` will be executed between every 100ms to 110ms.
+- `limited.to(count=1)`: The number of times `fn` will be execute within the time specified by `.per(time)`.
+- `limited.per(time=Infinity)`: The period of time in which `fn` will be executed `.to(count)` number of times.
+- `limited.evenly([toggle=true])`: Off by default.  When true, `fn` will be executed evenly through the time period specified by `.per(time)`.  For example, if set to true and `.to(10)` and `.per(1000)`, then `fn` will be executed every 100ms.
+- `limited.withFuzz([percent=0.1])`: Set to 0 by default.  Adds a random factor to the delay time.  For example if set to 0.1 and `.to(10)` and `.per(1000)`, then `fn` will be executed between every 100ms to 110ms.
 
 All methods return `limited` and can be chained.
 
