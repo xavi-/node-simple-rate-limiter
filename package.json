@@ -1,6 +1,6 @@
 {
   "name": "simple-rate-limiter",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A simple way to rate limit how often a function is executed.",
   "keywords": [
     "throttle",
