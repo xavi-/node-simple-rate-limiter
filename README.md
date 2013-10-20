@@ -47,11 +47,11 @@ Basic usage: `var limited = limit(fn);`
 
 All methods return `limited` and can be chained.
 
-## Edges cases
+## Edge cases
 
-Basic api: `limit(func).to(count).per(interval)`
+Basic usage: `limit(fn).to(count).per(interval)`
 
-The `to` method or `per` can be called any number of times including zero.  The effective default count for `to` is 1 and the effective default interval for `per` is Infinity.  Which means if neither the `to` method or `per` method are called, then `limit` will only execute `func` once ever:
+The `to` method or `per` can be called any number of times including zero.  The effective default count for `to` is 1 and the effective default interval for `per` is Infinity.  Which means if neither the `to` method or `per` method are called, then `limit` will only execute `fn` once ever:
 
 ```javascript
 var init = limit(function() { console.log("Runs only once"); });
@@ -62,7 +62,7 @@ for(var i = 0; i < 3; i++) { init(); }
 // ... Nothing else is ever printed ...
 ```
 
-Similarly, if `per` is never called, `func` is executed at most `count` number of times:
+Similarly, if `per` is never called, `fn` is executed at most `count` number of times:
 
 ```javascript
 var dos = limit(function() { console.log("twice only"); }).to(2);
@@ -74,7 +74,7 @@ for(var i = 0; i < 3; i++) { dos(); }
 // ... Nothing else is ever printed ...
 ```
 
-On the other hand, if `to` is never called, `func` is only executed every `interval` milliseconds:
+On the other hand, if `to` is never called, `fn` is only executed every `interval` milliseconds:
 
 ```javascript
 var tick = limit(function() { console.log("Once a second..."); }).per(1000);
