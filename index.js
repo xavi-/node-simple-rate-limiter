@@ -36,8 +36,8 @@ module.exports = function limit(fn) {
 		if(!timer) { timer = setTimeout(pump, 0); }
 	};
 
-	limiter.to = function(count) { _to = count; return limiter; };
-	limiter.per = function(time) { _per = time; return limiter; };
+	limiter.to = function(count) { _to = count || 1; return limiter; };
+	limiter.per = function(time) { _per = time || -1; return limiter; };
 	limiter.evenly = function(evenly) { _evenly = (evenly == null) || evenly; return limiter; };
 	limiter.withFuzz = function(fuzz) { _fuzz = fuzz || 0.1; return limiter; };
 
