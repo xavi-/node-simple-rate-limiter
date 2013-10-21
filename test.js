@@ -38,7 +38,6 @@ function runTickTests(count, per) {
 		if(prevTime) {
 			var diff = now - prevTime;
 			assert.ok(per <= diff + SLOP);
-			assert.ok(diff - SLOP <= per * 2);
 		}
 		prevTime = now;
 		if(isLast) {
@@ -82,7 +81,6 @@ function runEvenlyTest(count, to, per) {
 		var now = Date.now();
 		if(prevTime) {
 			var diff = (now - prevTime);
-			assert.ok(diff <= expDiff * 2 + SLOP, "Expected: " + expDiff + "; actual: " + diff);
 			assert.ok(expDiff - SLOP <= diff, "Expected: " + expDiff + "; actual: " + diff);
 		}
 		prevTime = now;
@@ -124,7 +122,6 @@ var erraticTimes = [
 	]
 ];
 erraticTimes.forEach(function(times) { runErraticQueueTest(times.length, 10, 1000, times); });
-
 
 runEvenlyTest(50, 17, 701);
 runEvenlyTest(50, 10, 1000);
