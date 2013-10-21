@@ -4,18 +4,14 @@ module.exports = function limit(fn) {
 	var _to = 1, _per = -1, _fuzz = 0, _evenly = false;
 	var pastExecs = [], queue = [], timer;
 
-	var exec = function(fn, args) {
-		pastExecs.push(Date.now());
-		fn.apply(null, args);
-	};
-
 	var pump = function() {
 		var now = Date.now();
 
 		pastExecs = pastExecs.filter(function(time) { return (now - time < _per); });
 
 		while(pastExecs.length < _to && queue.length > 0) {
-			exec(fn, queue.shift());
+			pastExecs.push(now);
+			fn.apply(null, queue.shift());
 			if(_evenly) { break; } // Ensures only one function is executed every pump
 		}
 
