@@ -4,7 +4,7 @@ var limit = require("./");
 const SLOP = 5; // Timers don't seem accurate to the millisecond
 
 var tests = {
-	expected: 292,
+	expected: 296,
 	executed: 0,
 	finished: function() { tests.executed++; }
 };
@@ -71,6 +71,24 @@ function runErraticQueueTest(count, to, per, erraticTimes) {
 	console.log("Starting erratic test -- count: %d, to: %d, per: %d", count, to, per);
 }
 
+function runEvenlyTest(count, to, per) {
+	var expDiff = per / count;
+	var prevTime, even = limit(function(isLast) {
+		if(prevTime) {
+			var diff = (Date.now() - prevTime);
+			assert.ok(diff < expDiff + SLOP, "Expected: " + expDiff + "; actual: " + diff);
+			assert.ok(expDiff - SLOP < diff, "Expected: " + expDiff + "; actual: " + diff);
+		}
+		prevTime = Date.now();
+		if(isLast) {
+			console.log("Completed evenly test -- count: %d, to: %d, per: %d", count, to, per);
+			tests.finished();
+		}
+	}).to(count).per(per).evenly();
+	for(var i = 0; i < count; i++) { even(i + 1 === count); }
+	console.log("Starting evenly test -- count: %d, to: %d, per: %d", count, to, per);
+}
+
 runBasicTest(50, 10, 1000);
 runBasicTest(25, 1, 100);
 runBasicTest(2500, 100, 10);
@@ -100,6 +118,12 @@ var erraticTimes = [
 	]
 ];
 erraticTimes.forEach(function(times) { runErraticQueueTest(times.length, 10, 1000, times); });
+
+
+runEvenlyTest(50, 17, 701);
+runEvenlyTest(50, 10, 1000);
+runEvenlyTest(25, 1, 100);
+runEvenlyTest(101, 73, 1409);
 
 var init = limit(function() { assert.ok(init.calls++ < 1); tests.finished(); });
 init.calls = 0;
