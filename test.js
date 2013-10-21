@@ -82,8 +82,8 @@ function runEvenlyTest(count, to, per) {
 		var now = Date.now();
 		if(prevTime) {
 			var diff = (now - prevTime);
-			assert.ok(diff < expDiff * 2, "Expected: " + expDiff + "; actual: " + diff);
-			assert.ok(expDiff - SLOP < diff, "Expected: " + expDiff + "; actual: " + diff);
+			assert.ok(diff <= expDiff * 2 + SLOP, "Expected: " + expDiff + "; actual: " + diff);
+			assert.ok(expDiff - SLOP <= diff, "Expected: " + expDiff + "; actual: " + diff);
 		}
 		prevTime = now;
 		if(isLast) {
