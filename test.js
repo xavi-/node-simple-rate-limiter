@@ -4,7 +4,7 @@ var limit = require("./");
 const SLOP = 5; // Timers don't seem accurate to the millisecond
 
 var tests = {
-	expected: 296,
+	expected: 19,
 	executed: 0,
 	finished: function() { tests.executed++; }
 };
@@ -33,16 +33,21 @@ function runBasicTest(count, to, per) {
 }
 
 function runTickTests(count, per) {
-	var tick = limit(function() {
-		if(!tick.lastCalled) { tick.lastCalled = Date.now(); }
-		else {
-			var now = Date.now();
-			assert.ok(per <= (now - tick.lastCalled) + SLOP);
-			tick.lastCalled = now;
+	var prevTime, tick = limit(function(isLast) {
+		var now = Date.now();
+		if(prevTime) {
+			var diff = now - prevTime;
+			assert.ok(per <= diff + SLOP);
+			assert.ok(diff - SLOP <= per * 2);
 		}
-		tests.finished();
+		prevTime = now;
+		if(isLast) {
+			console.log("Completed tick test -- count: %d, per: %d", count, per);
+			tests.finished();
+		}
 	}).per(per);
-	for(var i = 0; i < count; i++) { tick(); }
+	for(var i = 0; i < count; i++) { tick(i + 1 === count); }
+	console.log("Starting tick test -- count: %d, per: %d", count, per);
 }
 
 
@@ -74,12 +79,13 @@ function runErraticQueueTest(count, to, per, erraticTimes) {
 function runEvenlyTest(count, to, per) {
 	var expDiff = per / count;
 	var prevTime, even = limit(function(isLast) {
+		var now = Date.now();
 		if(prevTime) {
-			var diff = (Date.now() - prevTime);
-			assert.ok(diff < expDiff + SLOP, "Expected: " + expDiff + "; actual: " + diff);
+			var diff = (now - prevTime);
+			assert.ok(diff < expDiff * 2, "Expected: " + expDiff + "; actual: " + diff);
 			assert.ok(expDiff - SLOP < diff, "Expected: " + expDiff + "; actual: " + diff);
 		}
-		prevTime = Date.now();
+		prevTime = now;
 		if(isLast) {
 			console.log("Completed evenly test -- count: %d, to: %d, per: %d", count, to, per);
 			tests.finished();
