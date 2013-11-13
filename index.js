@@ -1,4 +1,14 @@
+var EventEmitter = require("events").EventEmitter;
+
 var slice = Array.prototype.slice;
+
+function reEmit(oriEmitter, newEmitter) {
+	var oriEmit = oriEmitter.emit, newEmit = newEmitter.emit;
+	oriEmitter.emit = function() {
+		newEmit.apply(newEmitter, arguments);
+		oriEmit.apply(oriEmitter, arguments);
+	};
+}
 
 module.exports = function limit(fn) {
 	var _to = 1, _per = -1, _fuzz = 0, _evenly = false;
@@ -11,7 +21,13 @@ module.exports = function limit(fn) {
 
 		while(pastExecs.length < _to && queue.length > 0) {
 			pastExecs.push(now);
-			fn.apply(null, queue.shift());
+
+			var tmp = queue.shift();
+			var rtn = fn.apply(null, tmp.args);
+			tmp.emitter.emit("limiter-exec", rtn);
+
+			if(rtn.on && rtn.emit) { reEmit(rtn, tmp.emitter); }
+
 			if(_evenly) { break; } // Ensures only one function is executed every pump
 		}
 
@@ -27,9 +43,13 @@ module.exports = function limit(fn) {
 	};
 
 	var limiter = function() {
-		queue.push(slice.call(arguments, 0));
+		var emitter = new EventEmitter();
+
+		queue.push({ emitter: emitter, args: slice.call(arguments, 0) });
 
 		if(!timer) { timer = setTimeout(pump, 0); }
+
+		return emitter;
 	};
 
 	limiter.to = function(count) { _to = count || 1; return limiter; };
