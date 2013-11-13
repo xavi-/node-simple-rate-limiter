@@ -45,7 +45,7 @@ Basic usage: `var limited = limit(fn);`
 - `limited.evenly([toggle=true])`: Off by default.  When true, `fn` will be executed evenly through the time period specified by `.per(time)`.  For example, if set to true and `.to(10)` and `.per(1000)`, then `fn` will be executed every 100ms.
 - `limited.withFuzz([percent=0.1])`: Set to 0 by default.  Adds a random factor to the delay time.  For example if set to 0.1 and `.to(10)` and `.per(1000)`, then `fn` will be executed between every 100ms to 110ms.
 
-All methods return `limited` and can be chained.
+All methods returned by `limited` and can be chained.
 
 ## Edge cases
 
