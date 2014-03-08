@@ -9,7 +9,7 @@ Currently works with node.js v0.10.1+ (and probably lower).
 If you want to limit _all_ requests:
 
 ```javascript
-var limit = require("limit");
+var limit = require("simple-rate-limiter");
 var request = limit(require("request")).to(10).per(1000);
 
 userIds.forEach(function(userId) {
