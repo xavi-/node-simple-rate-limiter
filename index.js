@@ -26,7 +26,7 @@ module.exports = function limit(fn) {
 			var rtn = fn.apply(null, tmp.args);
 			tmp.emitter.emit("limiter-exec", rtn);
 
-			if(rtn.on && rtn.emit) { reEmit(rtn, tmp.emitter); }
+			if(rtn && rtn.emit) { reEmit(rtn, tmp.emitter); }
 
 			if(_evenly) { break; } // Ensures only one function is executed every pump
 		}
