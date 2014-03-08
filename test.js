@@ -1,10 +1,11 @@
 var assert = require("assert");
 var limit = require("./");
+var EventEmitter = require("events").EventEmitter;
 
 const SLOP = 5; // Timers don't seem accurate to the millisecond
 
 var tests = {
-	expected: 19,
+	expected: 21,
 	executed: 0,
 	finished: function() { tests.executed++; }
 };
@@ -139,6 +140,30 @@ for(var i = 0; i < 5; i++) { dos(); }
 var isSet = false;
 limit(function() { assert.ok(isSet); tests.finished(); })();
 isSet = true;
+
+var rtnVal;
+var emitterTest = limit(function() {
+	var emitter = new EventEmitter();
+	setTimeout(function() { emitter.emit("hi", 1, 2, 3); });
+
+	rtnVal = emitter;
+	return rtnVal;
+});
+
+emitterTest()
+	.on("limiter-exec", function(rtn) {
+		console.log("Limiter executed event.");
+		assert.equal(rtn, rtnVal);
+		tests.finished();
+	})
+	.on("hi", function(a, b, c) {
+		console.log("Re-emitter message sent.");
+		assert.equal(a, 1);
+		assert.equal(b, 2);
+		assert.equal(c, 3);
+		tests.finished();
+	})
+;
 
 process.on("exit", function() {
 	assert.equal(tests.executed, tests.expected);
