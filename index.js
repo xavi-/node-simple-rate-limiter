@@ -47,7 +47,7 @@ module.exports = function limit(fn) {
 
 		queue.push({ emitter: emitter, args: slice.call(arguments, 0) });
 
-		if(!timer) { timer = setTimeout(pump, 0); }
+		if(!timer) { timer = setImmediate(pump); }
 
 		return emitter;
 	};
