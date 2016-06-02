@@ -52,10 +52,24 @@ module.exports = function limit(fn) {
 		return emitter;
 	};
 
-	limiter.to = function(count) { _to = count || 1; return limiter; };
-	limiter.per = function(time) { _per = time || -1; return limiter; };
-	limiter.evenly = function(evenly) { _evenly = (evenly == null) || evenly; return limiter; };
-	limiter.withFuzz = function(fuzz) { _fuzz = fuzz || 0.1; return limiter; };
+	var limiterWithArity = createFunctionWithArity(limiter, fn.length);
+	limiterWithArity.to = function(count) { _to = count || 1; return limiterWithArity; };
+	limiterWithArity.per = function(time) { _per = time || -1; return limiterWithArity; };
+	limiterWithArity.evenly = function(evenly) { _evenly = (evenly == null) || evenly; return limiterWithArity; };
+	limiterWithArity.withFuzz = function(fuzz) { _fuzz = fuzz || 0.1; return limiterWithArity; };
 
-	return limiter;
+	return limiterWithArity;
 };
+
+/**
+ * Given a function and arity, returns a new function with the given arity that proxies the input function
+ * c.f. {@link https://github.com/blakeembrey/arity}
+ * @param fxn {Function}
+ * @param arity {Number}
+ * @returns {Function} a new function with the given arity that proxies the input
+ */
+function createFunctionWithArity(fxn, arity){
+	var params = Array(arity).fill('_').join(', ');
+	var funcConstructor =  new Function('func', 'return function(' + params +') { return func.apply(this, arguments);}');
+	return funcConstructor(fxn)
+}
