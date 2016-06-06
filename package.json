@@ -1,6 +1,6 @@
 {
   "name": "simple-rate-limiter",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A simple way to rate limit how often a function is executed.",
   "keywords": [
     "throttle",
@@ -14,6 +14,9 @@
       "web": "http://xavi.co"
     }
   ],
+  "scripts" : {
+    "test" : "node test.js"
+  },
   "main": "./index.js",
   "repository": {
     "type": "git",
