@@ -57,5 +57,40 @@ module.exports = function limit(fn) {
 	limiter.evenly = function(evenly) { _evenly = (evenly == null) || evenly; return limiter; };
 	limiter.withFuzz = function(fuzz) { _fuzz = fuzz || 0.1; return limiter; };
 
+	/* Add support for Promises */
+	limiter.promise = function(promise) {
+		var res = null;
+		var rej = null;
+
+		var lim = limiter(options => {
+			promise(options)
+				.then(function(result) { 
+					res(result);
+				})
+				.catch(function(err) { 
+					rej(err);
+				})
+		});
+		var promiseWrapper = new Promise(function(resolve, reject) {
+			res = resolve;
+			rej = reject;
+		});
+
+		// return value
+		var self = function(options) { 
+			lim(options);
+			return promiseWrapper;
+		}
+		self.to = function(to) { 
+			lim.to(to); 
+			return self;
+		}
+		self.per = function(per) { 
+			lim.per(per); 
+			return self;
+		}
+		return self;
+	}
+
 	return limiter;
 };
