@@ -56,6 +56,8 @@ Basic usage: `var limited = limit(fn);`
 
 All methods attached to `limited` and can be chained.
 
+Context for a function can be set with `limit(fn, ctx)`.
+
 ## Edge cases
 
 Basic usage: `limit(fn).to(count).per(interval)`

@@ -10,7 +10,7 @@ function reEmit(oriEmitter, newEmitter) {
 	};
 }
 
-module.exports = function limit(fn) {
+module.exports = function limit(fn, ctx) {
 	var _to = 1, _per = -1, _fuzz = 0, _evenly = false, _maxQueueLength = 5000;
 	var pastExecs = [], queue = [], timer;
 
@@ -23,7 +23,7 @@ module.exports = function limit(fn) {
 			pastExecs.push(now);
 
 			var tmp = queue.shift();
-			var rtn = fn.apply(null, tmp.args);
+			var rtn = fn.apply(ctx, tmp.args);
 			tmp.emitter.emit("limiter-exec", rtn);
 
 			if(rtn && rtn.emit) { reEmit(rtn, tmp.emitter); }

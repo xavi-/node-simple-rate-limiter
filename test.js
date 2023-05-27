@@ -1,11 +1,12 @@
 var assert = require("assert");
 var limit = require("./");
+const { run } = require("node:test");
 var EventEmitter = require("events").EventEmitter;
 
 const SLOP = 5; // Timers don't seem accurate to the millisecond
 
 var tests = {
-	expected: 21,
+	expected: 22,
 	executed: 0,
 	finished: function() { tests.executed++; }
 };
@@ -117,9 +118,26 @@ function runMaxQueueLengthTest() {
 	} catch (err) {
 		assert.ok(err.message.includes("queue length"));
 	}
-
-	console.log("Completed max queue length test");
 }
+
+function runFunctionContextTest() {
+	console.log("Run function context test");
+
+	var SomeFn = function() {
+		this.value = "something";
+
+		this.getSomething = limit(function() {
+			return this.value;
+		}, this).to(10).per(1000);
+	}
+
+	var obj = new SomeFn();
+	obj.getSomething().on("limiter-exec", function(rtn) {
+		assert.equal(rtn, "something");
+		tests.finished();
+	});
+}
+
 
 runBasicTest(50, 10, 1000);
 runBasicTest(25, 1, 100);
@@ -159,6 +177,8 @@ runEvenlyTest(101, 73, 1409);
 runFunctionLengthTest();
 
 runMaxQueueLengthTest();
+
+runFunctionContextTest();
 
 var init = limit(function() { assert.ok(init.calls++ < 1); tests.finished(); });
 init.calls = 0;
