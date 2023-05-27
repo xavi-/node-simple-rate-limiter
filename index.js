@@ -11,7 +11,7 @@ function reEmit(oriEmitter, newEmitter) {
 }
 
 module.exports = function limit(fn) {
-	var _to = 1, _per = -1, _fuzz = 0, _evenly = false;
+	var _to = 1, _per = -1, _fuzz = 0, _evenly = false, _maxQueueLength = 5000;
 	var pastExecs = [], queue = [], timer;
 
 	var pump = function() {
@@ -43,6 +43,10 @@ module.exports = function limit(fn) {
 	};
 
 	var limiter = function() {
+		if(_maxQueueLength <= queue.length) {
+			throw new Error(`Max queue length (${_maxQueueLength}) exceeded`);
+		}
+
 		var emitter = new EventEmitter();
 
 		queue.push({ emitter: emitter, args: slice.call(arguments, 0) });
@@ -57,6 +61,7 @@ module.exports = function limit(fn) {
 	limiter.per = function(time) { _per = time || -1; return limiter; };
 	limiter.evenly = function(evenly) { _evenly = (evenly == null) || evenly; return limiter; };
 	limiter.withFuzz = function(fuzz) { _fuzz = fuzz || 0.1; return limiter; };
+	limiter.maxQueueLength = function(max) { _maxQueueLength = max; return limiter; };
 
 	return limiter;
 };

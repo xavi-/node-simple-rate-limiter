@@ -103,6 +103,24 @@ function runFunctionLengthTest() {
 	assert.equal(limited.length, original.length, "Expected function length to be equal")
 }
 
+function runMaxQueueLengthTest() {
+	console.log("Run max queue length test");
+
+	const limited = limit(() => {}).maxQueueLength(10);
+
+	try {
+		for (let i = 0; i < 100; i++) {
+			limited("hit the limit");
+		}
+
+		assert.fail("Expected error to be thrown");
+	} catch (err) {
+		assert.ok(err.message.includes("queue length"));
+	}
+
+	console.log("Completed max queue length test");
+}
+
 runBasicTest(50, 10, 1000);
 runBasicTest(25, 1, 100);
 runBasicTest(2500, 100, 10);
@@ -139,6 +157,8 @@ runEvenlyTest(25, 1, 100);
 runEvenlyTest(101, 73, 1409);
 
 runFunctionLengthTest();
+
+runMaxQueueLengthTest();
 
 var init = limit(function() { assert.ok(init.calls++ < 1); tests.finished(); });
 init.calls = 0;
