@@ -51,12 +51,8 @@ module.exports = function limit(fn) {
 
 		return emitter;
 	};
-	try {
-		Object.defineProperty(limiter, "length", {value: fn.length});
-	}
-	catch(e){
-		//do nothing. the length property won't be defined, but that's ok
-	}
+	Object.defineProperty(limiter, "length", {value: fn.length}); // Make limiter look more like fn
+
 	limiter.to = function(count) { _to = count || 1; return limiter; };
 	limiter.per = function(time) { _per = time || -1; return limiter; };
 	limiter.evenly = function(evenly) { _evenly = (evenly == null) || evenly; return limiter; };
