@@ -94,14 +94,13 @@ function runEvenlyTest(count, to, per) {
 	console.log("Starting evenly test -- count: %d, to: %d, per: %d", count, to, per);
 }
 
-function runFunctionBehaviorTest(){
-	console.log("Starting function behavior test");
+function runFunctionLengthTest() {
+	console.log("Run function length test");
 	function original(param1, param2, param3){
 		return;
 	}
 	var limited = limit(original);
 	assert.equal(limited.length, original.length, "Expected function length to be equal")
-	console.log("Completed function behavior test");
 }
 
 runBasicTest(50, 10, 1000);
@@ -138,7 +137,8 @@ runEvenlyTest(50, 17, 701);
 runEvenlyTest(50, 10, 1000);
 runEvenlyTest(25, 1, 100);
 runEvenlyTest(101, 73, 1409);
-runFunctionBehaviorTest();
+
+runFunctionLengthTest();
 
 var init = limit(function() { assert.ok(init.calls++ < 1); tests.finished(); });
 init.calls = 0;
