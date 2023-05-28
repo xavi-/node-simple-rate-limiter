@@ -137,6 +137,47 @@ function runFunctionContextTest() {
 	});
 }
 
+function runEdgeCaseTests() {
+	console.log("Run edge case tests");
+
+	var init = limit(function() { assert.ok(init.calls++ < 1); tests.finished(); });
+	init.calls = 0;
+	for(var i = 0; i < 5; i++) { init(); }
+
+	var dos = limit(function() { assert.ok(dos.calls++ < 2); tests.finished(); }).to(2);
+	dos.calls = 0;
+	for(var i = 0; i < 5; i++) { dos(); }
+
+	var isEdger = true;
+	limit(function() { assert.ok(!isEdger); tests.finished(); })();
+	isEdger = false;
+}
+
+function runReEmitTest() {
+	var rtnVal;
+	var emitterTest = limit(function() {
+		var emitter = new EventEmitter();
+		setTimeout(function() { emitter.emit("hi", 1, 2, 3); });
+
+		rtnVal = emitter;
+		return rtnVal;
+	});
+
+	emitterTest()
+		.on("limiter-exec", function(rtn) {
+			console.log("Limiter executed event.");
+			assert.equal(rtn, rtnVal);
+			tests.finished();
+		})
+		.on("hi", function(a, b, c) {
+			console.log("Re-emitter message sent.");
+			assert.equal(a, 1);
+			assert.equal(b, 2);
+			assert.equal(c, 3);
+			tests.finished();
+		})
+	;
+}
 
 runBasicTest(50, 10, 1000);
 runBasicTest(25, 1, 100);
@@ -181,41 +222,9 @@ runMaxQueueLengthTest();
 
 runFunctionContextTest();
 
-var init = limit(function() { assert.ok(init.calls++ < 1); tests.finished(); });
-init.calls = 0;
-for(var i = 0; i < 5; i++) { init(); }
+runEdgeCaseTests();
 
-var dos = limit(function() { assert.ok(dos.calls++ < 2); tests.finished(); }).to(2);
-dos.calls = 0;
-for(var i = 0; i < 5; i++) { dos(); }
-
-var isSet = false;
-limit(function() { assert.ok(isSet); tests.finished(); })();
-isSet = true;
-
-var rtnVal;
-var emitterTest = limit(function() {
-	var emitter = new EventEmitter();
-	setTimeout(function() { emitter.emit("hi", 1, 2, 3); });
-
-	rtnVal = emitter;
-	return rtnVal;
-});
-
-emitterTest()
-	.on("limiter-exec", function(rtn) {
-		console.log("Limiter executed event.");
-		assert.equal(rtn, rtnVal);
-		tests.finished();
-	})
-	.on("hi", function(a, b, c) {
-		console.log("Re-emitter message sent.");
-		assert.equal(a, 1);
-		assert.equal(b, 2);
-		assert.equal(c, 3);
-		tests.finished();
-	})
-;
+runReEmitTest();
 
 process.on("exit", function() {
 	assert.equal(tests.executed, tests.expected);
