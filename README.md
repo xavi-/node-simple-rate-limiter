@@ -2,8 +2,6 @@
 
 A simple way to limit how often a function is executed.
 
-Currently works with node.js v0.10.1+ (and probably lower).
-
 ## Examples
 
 If you want to limit _all_ requests:
@@ -38,7 +36,7 @@ userIds.forEach(function(userId) {
 
 ## API
 
-Basic usage: `var limited = limit(fn);`
+Basic usage: `let limited = limit(fn)`
 
 - `limited(args...)`: Enqueues a set of arguments that `fn` will be executed with.  Returns an [EventEmitter](http://nodejs.org/docs/latest/api/events.html#events_class_events_eventemitter) that will emit a `limiter-exec` event when `fn` is executed with `args`.  Also, in the case that `fn` returns an EventEmitter, the events emmitted by the returned EventEmitter will be relayed to the EventEmitter returned by `limited`.  In other words, stuff like this works:
 
