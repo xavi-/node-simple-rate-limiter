@@ -1,6 +1,5 @@
 var assert = require("assert");
 var limit = require("./");
-const { run } = require("node:test");
 var EventEmitter = require("events").EventEmitter;
 
 const SLOP = 5; // Timers don't seem accurate to the millisecond
