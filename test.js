@@ -148,7 +148,7 @@ runTickTests(25, 100);
 runTickTests(250, 10);
 runTickTests(3, 1409);
 
-var erraticTimes = [
+const erraticTimes = [
 	[
 		0, 800, 800, 800, 850, 850, 850, 1050, 1100, 1100, 1100, 1100, 1800, 1800, 1800, 1800,
 		1800, 2100, 2100, 2100
@@ -166,7 +166,9 @@ var erraticTimes = [
 		3848, 3863, 3875, 3888, 3895, 3909, 3920, 3926
 	]
 ];
-erraticTimes.forEach(function(times) { runErraticQueueTest(times.length, 10, 1000, times); });
+for(const times of erraticTimes) {
+	runErraticQueueTest(times.length, 10, 1000, times);
+}
 
 runEvenlyTest(50, 17, 701);
 runEvenlyTest(50, 10, 1000);
