@@ -1,6 +1,4 @@
-var EventEmitter = require("events").EventEmitter;
-
-var slice = Array.prototype.slice;
+const EventEmitter = require("events").EventEmitter;
 
 function reEmit(oriEmitter, newEmitter) {
 	var oriEmit = oriEmitter.emit, newEmit = newEmitter.emit;
@@ -42,20 +40,20 @@ module.exports = function limit(fn, ctx) {
 		}
 	};
 
-	var limiter = function() {
+	var limiter = function(...args) {
 		if(_maxQueueLength <= queue.length) {
 			throw new Error(`Max queue length (${_maxQueueLength}) exceeded`);
 		}
 
 		var emitter = new EventEmitter();
 
-		queue.push({ emitter: emitter, args: slice.call(arguments, 0) });
+		queue.push({ emitter, args });
 
 		if(!timer) { timer = setImmediate(pump); }
 
 		return emitter;
 	};
-	Object.defineProperty(limiter, "length", {value: fn.length}); // Make limiter look more like fn
+	Object.defineProperty(limiter, "length", { value: fn.length }); // Match fn signature
 
 	limiter.to = function(count) { _to = count || 1; return limiter; };
 	limiter.per = function(time) { _per = time || -1; return limiter; };
