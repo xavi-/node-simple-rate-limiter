@@ -8,7 +8,7 @@ function reEmit(oriEmitter, newEmitter) {
 	};
 }
 
-module.exports = function limit(fn, ctx) {
+function limit(fn, ctx) {
 	var _to = 1, _per = -1, _fuzz = 0, _evenly = false, _maxQueueLength = 5000;
 	var pastExecs = [], queue = [], timer;
 
@@ -61,40 +61,26 @@ module.exports = function limit(fn, ctx) {
 	limiter.withFuzz = function(fuzz) { _fuzz = fuzz || 0.1; return limiter; };
 	limiter.maxQueueLength = function(max) { _maxQueueLength = max; return limiter; };
 
-	/* Add support for Promises */
-	limiter.promise = function(promise) {
-		var res = null;
-		var rej = null;
-
-		var lim = limiter(options => {
-			promise(options)
-				.then(function(result) { 
-					res(result);
-				})
-				.catch(function(err) { 
-					rej(err);
-				})
-		});
-		var promiseWrapper = new Promise(function(resolve, reject) {
-			res = resolve;
-			rej = reject;
-		});
-
-		// return value
-		var self = function(options) { 
-			lim(options);
-			return promiseWrapper;
-		}
-		self.to = function(to) { 
-			lim.to(to); 
-			return self;
-		}
-		self.per = function(per) { 
-			lim.per(per); 
-			return self;
-		}
-		return self;
-	}
-
 	return limiter;
 };
+
+limit.promise = function(promiser, ctx) {
+	const limiter = limit(promiser, ctx);
+
+	function wrapper(...args) {
+		return new Promise(function(resolve, reject) {
+			limiter(...args).on("limiter-exec", rtn => rtn.then(resolve).catch(reject));
+		});
+	};
+	Object.defineProperty(wrapper, "length", { value: promiser.length }); // Match promiser signature
+
+	wrapper.to = function(count) { limiter.to(count); return wrapper; };
+	wrapper.per = function(time) { limiter.per(time); return wrapper; };
+	wrapper.evenly = function(evenly) { limiter.evenly(evenly);  return wrapper; };
+	wrapper.withFuzz = function(fuzz) { limiter.fuzz(fuzz); return wrapper; };
+	wrapper.maxQueueLength = function(max) { limiter.maxQueueLength(max); return wrapper; };
+
+	return wrapper;
+};
+
+module.exports = limit;

@@ -5,7 +5,7 @@ var EventEmitter = require("events").EventEmitter;
 const SLOP = 5; // Timers don't seem accurate to the millisecond
 
 var tests = {
-	expected: 22,
+	expected: 27,
 	executed: 0,
 	finished: function() { tests.executed++; }
 };
@@ -154,6 +154,8 @@ function runEdgeCaseTests() {
 }
 
 function runReEmitTest() {
+	console.log("Run re-emit tests");
+
 	var rtnVal;
 	var emitterTest = limit(function() {
 		var emitter = new EventEmitter();
@@ -177,6 +179,78 @@ function runReEmitTest() {
 			tests.finished();
 		})
 	;
+}
+
+function runBasicPromiseTest() {
+	console.log("Running basic promise tests");
+
+	const promiser = (text) => new Promise((resolve, reject) => {
+		setTimeout(() => text == "fail" ? reject(text) : resolve(text), 100);
+	});
+	const limited = limit.promise(promiser).to(3);
+
+	limited("hello").then(text => {
+		assert.equal(text, "hello");
+		tests.finished();
+	}).catch(() => assert.fail());
+
+	limited("hey").then(text => {
+		assert.equal(text, "hey");
+		tests.finished();
+	}).catch(() => assert.fail());
+
+	limited("fail")
+		.then(() => assert.fail())
+		.catch(text => {
+			assert.equal(text, "fail");
+			tests.finished();
+		})
+	;
+
+	limited("never called")
+		.then(() => assert.fail())
+		.catch(() => assert.fail())
+	;
+}
+
+function runTimingPromiseTest() {
+	console.log("Starting timing promise tests");
+
+	const promiser = () => new Promise(resolve => resolve());
+	const limited = limit.promise(promiser).to(3).per(1000);
+
+	const timings = [], start = Date.now();
+	limited().then(() => timings.push(Date.now())).catch(() => assert.fail());
+	limited().then(() => timings.push(Date.now())).catch(() => assert.fail());
+	limited().then(() => timings.push(Date.now())).catch(() => assert.fail());
+	limited()
+		.then(() => timings.push(Date.now())).catch(() => assert.fail())
+		.then(() => {
+			assert.ok(timings[0] - start <= SLOP);
+			assert.ok(timings[1] - timings[0] <= SLOP);
+			assert.ok(timings[2] - timings[1] <= SLOP);
+
+			assert.ok(timings[3] - timings[0] >= 1000 - SLOP);
+			tests.finished();
+
+			console.log("Completed timing promise test", timings.map(t => t - start));
+		})
+	;
+}
+
+async function runAwaitPromiseTest() {
+	console.log("Running await promise tests");
+
+	const promiser = num => new Promise(resolve => resolve(num * 2));
+	const limited = limit.promise(promiser).to(5).per(1000);
+
+	const numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+	const doubled = await Promise.all(numbers.map(num => limited(num)));
+
+	assert.deepEqual(doubled, [ 2, 4, 6, 8, 10, 12, 14, 16, 18 ]);
+
+	tests.finished();
+	console.log("Completed await promise test");
 }
 
 runBasicTest(50, 10, 1000);
@@ -225,6 +299,10 @@ runFunctionContextTest();
 runEdgeCaseTests();
 
 runReEmitTest();
+
+runBasicPromiseTest();
+runTimingPromiseTest();
+runAwaitPromiseTest();
 
 process.on("exit", function() {
 	assert.equal(tests.executed, tests.expected);

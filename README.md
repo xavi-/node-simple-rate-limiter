@@ -56,7 +56,22 @@ Basic usage: `var limited = limit(fn);`
 
 All methods attached to `limited` and can be chained.
 
-Context for a function can be set with `limit(fn, ctx)`.
+Context for a function can be set with `limit(fn, ctx)` or `limit.promise(promiser, ctx)`.
+
+### Promises
+
+Simple rate limiter supports promises with `limit.promise`.  Limited promises have support the same chainable methods as `limit`.  Example usage:
+
+```js
+const limited = limit(getUser).to(10).per(1000);
+
+const users = await Promise.all(userIds.map(id => limited(id)));
+
+/* ... Yay, I didn't spam anyone! ... */
+```
+
+- `limit.promise(promiser[, ctx])`: Returns a promise.  Calls the `promises` no more often than the `to` and `per` fields dictate.  An optional context parameter can be passed in.
+
 
 ## Edge cases
 
