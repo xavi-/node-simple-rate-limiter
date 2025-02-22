@@ -61,7 +61,7 @@ Context for a function can be set with `limit(fn, ctx)` or `limit.promise(promis
 Simple rate limiter supports promises with `limit.promise`.  Limited promises have support the same chainable methods as `limit`.  Example usage:
 
 ```js
-const limited = limit(getUser).to(10).per(1000);
+const limited = limit.promise(getUser).to(10).per(1000);
 
 const users = await Promise.all(userIds.map(id => limited(id)));
 
